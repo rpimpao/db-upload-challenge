@@ -25,6 +25,16 @@ class CreateTransactionService {
       throw new AppError('Transaction type must be "income" or "outcome"', 400);
     }
 
+    if (type === 'outcome') {
+      const balance = await transactionsRepository.getBalance();
+      if (value > balance.total) {
+        throw new AppError(
+          'Cannot create outcome transaction without a valid balance',
+          400,
+        );
+      }
+    }
+
     const createCategory = new CreateCategoryService();
 
     // create a new category or return the existing one
